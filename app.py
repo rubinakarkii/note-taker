@@ -1,5 +1,7 @@
 from flask import request, jsonify
 from models import app, db, User, Notes
+from celery_worker import celery, send_reminder
+from celery.result import AsyncResult
 
 # Route to create a new note
 @app.route('/notes', methods=['POST'])
@@ -18,7 +20,7 @@ def create_note():
 # Route to update a note by ID
 @app.route('/notes/<int:id>', methods=['PUT'])
 def update_note(id):
-    note = Notes.query.get_or_404(id)
+    note = Notes.query.get_or_404(id=id)
     data = request.get_json()
 
     title = data.get('title')
@@ -39,7 +41,7 @@ def get_notes():
 
 @app.route('/notes/<int:id>', methods=['DELETE'])
 def delete_note(id):
-    note = Notes.query.get_or_404(id)
+    note = Notes.query.get_or_404(id=id)
 
     db.session.delete(note)
     db.session.commit()
@@ -48,18 +50,53 @@ def delete_note(id):
 
 
 @app.route('/create_reminder', methods=['POST'])
-def create_reminder(id):
-    pass
+def create_reminder():
+    data = request.get_json()
+    notes_id = data.get('notes_id')
+    reminder_eta = data.get('eta')
+    receiver_email = data.get('email')
+    note = Notes.query.get_or_404(id=notes_id)
+    task = send_reminder.apply_async(args=[note.content, receiver_email], eta=reminder_eta)
+    note.task_id = task.id
+    db.session.commit()
 
+    return jsonify({'message': 'Reminder added'}), 200
 
 @app.route('/update_reminder', methods=['POST'])
-def update_reminder(id):
-    pass
+def update_reminder():
+    data = request.get_json()
+    notes_id = data.get('notes_id')
+    reminder_eta = data.get('eta')
+    receiver_email = data.get('email')
+    note = Notes.query.get_or_404(id=notes_id)
+    try:
+        result = AsyncResult(note.task_id, app=celery)
+        if result.state in ['PENDING', 'RECEIVED', 'STARTED']:
+            result.revoke(terminate=True)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    task = send_reminder.apply_async(args=[note.content, receiver_email], eta=reminder_eta)
+    note.task_id = task.id
+    db.session.commit()
+
+    return jsonify({'message': 'Reminder updated'}), 200
 
 
 @app.route('/delete_reminder', methods=['POST'])
-def delete_reminder(id):
-    pass
+def delete_reminder():
+    data = request.get_json()
+    notes_id = data.get('notes_id')
+    note = Notes.query.get_or_404(id=notes_id)
+    try:
+        result = AsyncResult(note.task_id, app=celery)
+        if result.state in ['PENDING', 'RECEIVED', 'STARTED']:
+            result.revoke(terminate=True)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    note.task_id=None
+    db.session.commit()
+
+    return jsonify({'message': 'Reminder deleted'}), 200
 
 
 if __name__ == '__main__':
