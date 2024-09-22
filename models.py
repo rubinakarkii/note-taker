@@ -19,6 +19,7 @@ class User(db.Model):
     def __repr__(self):
         return f'User: {self.username}>'
 
+
 class Notes(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=True)
@@ -32,6 +33,7 @@ class Notes(db.Model):
 
     def __repr__(self):
         return f'{self.user_id} | {self.id}=> {self.title}>'
+
 
 with app.app_context():
     db.create_all()
