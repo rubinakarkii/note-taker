@@ -1,9 +1,10 @@
 from flask import request, jsonify
-from models import app, db, User, Notes
-from celery_worker import celery, send_reminder
 from celery.result import AsyncResult
 
-# Route to create a new note
+from models import app, db, Notes
+from celery_worker import celery, send_reminder
+
+
 @app.route('/notes', methods=['POST'])
 def create_note():
     data = request.get_json()
@@ -17,7 +18,6 @@ def create_note():
     return jsonify(new_note.to_dict()), 201
 
 
-# Route to update a note by ID
 @app.route('/notes/<int:id>', methods=['PUT'])
 def update_note(id):
     note = Notes.query.get_or_404(id=id)
