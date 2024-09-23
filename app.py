@@ -15,12 +15,12 @@ def create_note():
     db.session.add(new_note)
     db.session.commit()
 
-    return jsonify(new_note.to_dict()), 201
+    return jsonify({'message': 'Note added'}), 200
 
 
 @app.route('/notes/<int:id>', methods=['PUT'])
 def update_note(id):
-    note = Notes.query.get_or_404(id=id)
+    note = Notes.query.get_or_404(id)
     data = request.get_json()
 
     title = data.get('title')
@@ -30,18 +30,18 @@ def update_note(id):
     note.content = content
     db.session.commit()
 
-    return jsonify(note.to_dict()), 200
+    return jsonify({'message': 'Note updated'}), 200
 
 
 @app.route('/list_notes', methods=['GET'])
 def get_notes():
     notes = Notes.query.all()
-    return jsonify([note.to_dict() for note in notes]), 200
+    return jsonify([{key: value for key, value in note.__dict__.items() if key != '_sa_instance_state'} for note in notes])
 
 
 @app.route('/notes/<int:id>', methods=['DELETE'])
 def delete_note(id):
-    note = Notes.query.get_or_404(id=id)
+    note = Notes.query.get_or_404(id)
 
     db.session.delete(note)
     db.session.commit()
@@ -55,8 +55,9 @@ def create_reminder():
     notes_id = data.get('notes_id')
     reminder_eta = data.get('eta')
     receiver_email = data.get('email')
-    note = Notes.query.get_or_404(id=notes_id)
-    task = send_reminder.apply_async(args=[note.content, receiver_email], eta=reminder_eta)
+    note = Notes.query.get_or_404(notes_id)
+    task = send_reminder.apply_async(args=[note.content, receiver_email], eta=reminder_eta
+                                    )
     note.task_id = task.id
     db.session.commit()
 
@@ -68,14 +69,15 @@ def update_reminder():
     notes_id = data.get('notes_id')
     reminder_eta = data.get('eta')
     receiver_email = data.get('email')
-    note = Notes.query.get_or_404(id=notes_id)
+    note = Notes.query.get_or_404(notes_id)
     try:
         result = AsyncResult(note.task_id, app=celery)
         if result.state in ['PENDING', 'RECEIVED', 'STARTED']:
             result.revoke(terminate=True)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    task = send_reminder.apply_async(args=[note.content, receiver_email], eta=reminder_eta)
+    task = send_reminder.apply_async(args=[note.content, receiver_email], eta=reminder_eta
+                                    )
     note.task_id = task.id
     db.session.commit()
 
@@ -86,7 +88,7 @@ def update_reminder():
 def delete_reminder():
     data = request.get_json()
     notes_id = data.get('notes_id')
-    note = Notes.query.get_or_404(id=notes_id)
+    note = Notes.query.get_or_404(notes_id)
     try:
         result = AsyncResult(note.task_id, app=celery)
         if result.state in ['PENDING', 'RECEIVED', 'STARTED']:

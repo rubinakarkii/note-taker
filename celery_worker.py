@@ -40,12 +40,11 @@ def send_reminder(reminder_content, receiver_email):
         try:
             msg = Message(
                 'Reminder Notification',
-                sender='@example.com',  # Set your sender email
+                sender='@example.com',
                 recipients=[receiver_email]
             )
             msg.body = f"Here is your reminder:\n\n{reminder_content}"
 
-            # Send the email
             mail.send(msg)
             
             return f"Reminder sent to {receiver_email}"

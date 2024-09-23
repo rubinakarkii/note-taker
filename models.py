@@ -41,7 +41,7 @@ class Notes(db.Model):
     # user = db.relationship('User', backref=db.backref('notes', lazy=True))
 
     def __repr__(self):
-        return f'{self.user_id} | {self.id}=> {self.title}'
+        return f'{self.id}=> {self.title}'
 
 
 with app.app_context():
