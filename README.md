@@ -1,14 +1,16 @@
 # Project Description #
 
 # Installation #
-## Prerequisites ##
-React Js(README for the frontend is in the frontend folder)
-Python 3.8+
-PostgreSQL installed and running
-RabbitMQ server running
-A virtual environment 
 
-## Setup Instructions ##
+## Frontend Setup Instructions ##
+```
+brew install node
+brew install yarn
+yarn install
+yarn dev
+```
+
+## Backend Setup Instructions ##
 Clone the repository:
 ```
 git clone https://github.com/your-username/note-taker.git
@@ -35,10 +37,14 @@ DB_HOST=
 DB_PORT=
 MAILTRAP_API_TOKEN=
 ```
+Run db script
+```
+python models.py
+```
 
 Run the Flask app:
 ```
-flask app.py
+python app.py
 ```
 Run the Celery worker: Open another terminal window, activate the virtual environment, and run the Celery worker:
 ```
@@ -50,3 +56,4 @@ Make sure RabbitMQ is running before starting Celery. You can install RabbitMQ h
 brew install rabbitmq  # For macOS with Homebrew
 brew services start rabbitmq
 ```
+

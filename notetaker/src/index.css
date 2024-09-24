@@ -145,3 +145,57 @@ button:focus-visible {
     @apply bg-background text-foreground;
   }
 }
+
+
+
+.react-datepicker {
+  font-family: Arial, sans-serif; /* Change the font */
+  background-color: #fff; /* Background color */
+  border: 1px solid #ccc; /* Border color */
+  border-radius: 5px; /* Rounded corners */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
+}
+
+.react-datepicker-wrapper, .react-datepicker-wrapper input{
+  height: 30px;
+  width: 100%;
+}
+
+.react-datepicker__header {
+  
+  background-image: url('/src/assets/notes.webp?height=280&width=140');
+  color: #fff; 
+  background-size: cover; 
+  background-position: center; 
+  background-repeat: no-repeat; 
+  
+}
+
+.react-datepicker__current-month {
+  font-weight: bold; /* Bold month text */
+}
+
+.react-datepicker__day {
+  width: 40px; /* Day cell width */
+  height: 40px; /* Day cell height */
+  line-height: 40px; /* Centering the text */
+  border-radius: 5px; /* Rounded day cells */
+  transition: background-color 0.2s; /* Transition effect for hover */
+}
+
+.react-datepicker__day:hover {
+  background-color: #f0f0f0; /* Hover effect */
+}
+
+.react-datepicker__day--selected {
+  background-color: #007bff; /* Selected day background */
+  color: #fff; /* Selected day text color */
+}
+
+.react-datepicker__time-container {
+  background-color: #f9f9f9; /* Background for time container */
+}
+
+.react-datepicker__time .react-datepicker__time-box {
+  border: none; /* Remove border */
+}

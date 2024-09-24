@@ -51,7 +51,7 @@ def delete_note(id):
     db.session.delete(note)
     db.session.commit()
 
-    return jsonify({'message': 'Note deleted'}), 200
+    return jsonify({'message': 'Note deleted successfully'}), 200
 
 
 @app.route('/create_reminder', methods=['POST'])
