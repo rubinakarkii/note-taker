@@ -33,7 +33,7 @@ def update_note(id):
     return jsonify({'message': 'Note updated successfully'}), 200
 
 
-@app.route('/list_notes', methods=['GET'])
+@app.route('/notes', methods=['GET'])
 def get_notes():
     notes = Notes.query.all()
     return jsonify([{key: value for key, value in note.__dict__.items() if key != '_sa_instance_state'} for note in notes])
