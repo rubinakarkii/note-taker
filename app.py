@@ -1,11 +1,13 @@
 from flask import request, jsonify
 from celery.result import AsyncResult
+from flask_cors import CORS, cross_origin
 
 from models import app, db, Notes
 from celery_worker import celery, send_reminder
 
 
 @app.route('/notes', methods=['POST'])
+@cross_origin(origin='*')
 def create_note():
     data = request.get_json()
     title = data.get('title')
@@ -19,6 +21,7 @@ def create_note():
 
 
 @app.route('/notes/<int:id>', methods=['PUT'])
+@cross_origin(origin='*')
 def update_note(id):
     note = Notes.query.get_or_404(id)
     data = request.get_json()
@@ -34,12 +37,14 @@ def update_note(id):
 
 
 @app.route('/notes', methods=['GET'])
+@cross_origin(origin='*')
 def get_notes():
     notes = Notes.query.all()
     return jsonify([{key: value for key, value in note.__dict__.items() if key != '_sa_instance_state'} for note in notes])
 
 
 @app.route('/notes/<int:id>', methods=['DELETE'])
+@cross_origin(origin='*')
 def delete_note(id):
     note = Notes.query.get_or_404(id)
 
@@ -50,6 +55,7 @@ def delete_note(id):
 
 
 @app.route('/create_reminder', methods=['POST'])
+@cross_origin(origin='*')
 def create_reminder():
     data = request.get_json()
     notes_id = data.get('notes_id')
@@ -65,6 +71,7 @@ def create_reminder():
     return jsonify({'message': 'Reminder added successfully'}), 200
 
 @app.route('/update_reminder', methods=['POST'])
+@cross_origin(origin='*')
 def update_reminder():
     data = request.get_json()
     notes_id = data.get('notes_id')
@@ -87,6 +94,7 @@ def update_reminder():
 
 
 @app.route('/delete_reminder', methods=['POST'])
+@cross_origin(origin='*')
 def delete_reminder():
     data = request.get_json()
     notes_id = data.get('notes_id')
