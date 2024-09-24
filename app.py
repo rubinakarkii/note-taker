@@ -14,8 +14,8 @@ def create_note():
     new_note = Notes(title=title, content=content)
     db.session.add(new_note)
     db.session.commit()
-
-    return jsonify({'message': 'Note added'}), 200
+    
+    return jsonify({'message': 'Note added successfully'}), 200
 
 
 @app.route('/notes/<int:id>', methods=['PUT'])
@@ -30,7 +30,7 @@ def update_note(id):
     note.content = content
     db.session.commit()
 
-    return jsonify({'message': 'Note updated'}), 200
+    return jsonify({'message': 'Note updated successfully'}), 200
 
 
 @app.route('/list_notes', methods=['GET'])
@@ -59,9 +59,10 @@ def create_reminder():
     task = send_reminder.apply_async(args=[note.content, receiver_email], eta=reminder_eta
                                     )
     note.task_id = task.id
+    note.eta = reminder_eta
     db.session.commit()
 
-    return jsonify({'message': 'Reminder added'}), 200
+    return jsonify({'message': 'Reminder added successfully'}), 200
 
 @app.route('/update_reminder', methods=['POST'])
 def update_reminder():
@@ -79,9 +80,10 @@ def update_reminder():
     task = send_reminder.apply_async(args=[note.content, receiver_email], eta=reminder_eta
                                     )
     note.task_id = task.id
+    note.eta = reminder_eta
     db.session.commit()
 
-    return jsonify({'message': 'Reminder updated'}), 200
+    return jsonify({'message': 'Reminder updated successfully'}), 200
 
 
 @app.route('/delete_reminder', methods=['POST'])
@@ -96,9 +98,10 @@ def delete_reminder():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     note.task_id=None
+    note.eta = None
     db.session.commit()
 
-    return jsonify({'message': 'Reminder deleted'}), 200
+    return jsonify({'message': 'Reminder deleted successfully'}), 200
 
 
 if __name__ == '__main__':

@@ -33,6 +33,7 @@ class Notes(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=True)
     content = db.Column(db.Text, nullable=True)
+    eta= db.Column(db.DateTime, nullable=True)
     task_id = db.Column(db.String, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now(), nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.now(), onupdate=datetime.now(), nullable=False)
