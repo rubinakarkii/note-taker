@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from celery.result import AsyncResult
-from flask_cors import CORS, cross_origin
+from flask_cors import cross_origin
 
 from models import app, db, Notes
 from celery_worker import celery, send_reminder
@@ -12,12 +12,10 @@ def create_note():
     data = request.get_json()
     title = data.get('title')
     content = data.get('content')
-
     new_note = Notes(title=title, content=content)
     db.session.add(new_note)
     db.session.commit()
-    
-    return jsonify({'message': 'Note added successfully'}), 200
+    return jsonify(new_note.to_dict(), {'message': 'Note added successfully'}), 200
 
 
 @app.route('/notes/<int:id>', methods=['PUT'])
@@ -33,14 +31,14 @@ def update_note(id):
     note.content = content
     db.session.commit()
 
-    return jsonify({'message': 'Note updated successfully'}), 200
+    return jsonify(note.to_dict(),{'message': 'Note updated successfully'}), 200
 
 
 @app.route('/notes', methods=['GET'])
 @cross_origin(origin='*')
 def get_notes():
     notes = Notes.query.all()
-    return jsonify([{key: value for key, value in note.__dict__.items() if key != '_sa_instance_state'} for note in notes])
+    return jsonify([note.to_dict() for note in notes]), 200
 
 
 @app.route('/notes/<int:id>', methods=['DELETE'])
@@ -66,6 +64,7 @@ def create_reminder():
                                     )
     note.task_id = task.id
     note.eta = reminder_eta
+    note.email = receiver_email
     db.session.commit()
 
     return jsonify({'message': 'Reminder added successfully'}), 200
@@ -88,6 +87,7 @@ def update_reminder():
                                     )
     note.task_id = task.id
     note.eta = reminder_eta
+    note.email = receiver_email
     db.session.commit()
 
     return jsonify({'message': 'Reminder updated successfully'}), 200
@@ -107,6 +107,7 @@ def delete_reminder():
         return jsonify({'error': str(e)}), 500
     note.task_id=None
     note.eta = None
+    note.email = None
     db.session.commit()
 
     return jsonify({'message': 'Reminder deleted successfully'}), 200
