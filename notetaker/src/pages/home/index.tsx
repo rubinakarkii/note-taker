@@ -19,7 +19,6 @@ function home() {
   const [scheduleNotePopup, setScheduleNotePopup] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [scheduleItem, setScheduleItem] = useState(null);
-  const [editScheduleItem, setEditScheduleItem] = useState(null)
 
   const methods = useForm();
 
@@ -127,6 +126,7 @@ function home() {
             onClose={handleSchedulePopup}
             getNotes={getNotes}
             scheduleItem={scheduleItem}
+            setScheduleItem={setScheduleItem}
           />
         )}
       </div>

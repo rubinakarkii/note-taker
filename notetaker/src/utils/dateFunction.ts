@@ -20,8 +20,6 @@ export function formatToETA(date) {
 }
 
 export function formatETA(eta: any) {
-  const date = new Date(eta);
-
   const options = {
     year: 'numeric',
     month: 'long',
@@ -33,15 +31,28 @@ export function formatETA(eta: any) {
     timeZoneName: 'short'
   };
 
-  return date.toLocaleString('en-US', options);
+  return eta.toLocaleString('en-US', options);
 }
 
-export const isDateInFuture = (eta) => {
-    const currentDate = new Date();
-    const etaDate = new Date(eta);
-    return etaDate > currentDate; // Returns true if etaDate is in the future
-  };
+export function formatDate(eta: string) {
+  const etaString= eta?.slice(0, -3)
+  const etaDate = new Date(etaString); 
+  return etaDate
+}
 
+
+
+
+export const isDateInFuture = (eta:string) => {
+  const currentDate = new Date(); 
+  const etaString= eta?.slice(0, -3)
+  const etaDate = new Date(etaString); 
+
+  // console.log(new Date(etaString),{currentDate});
+  
+
+  return etaDate>currentDate
+};
 
 
 

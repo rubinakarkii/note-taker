@@ -1,5 +1,4 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,7 +14,7 @@ export function ContentWindowWithDelete({
   getNotes,
   editItem,
   setEditItem,
-}) {
+}:any) {
   const {
     register,
     handleSubmit,
@@ -26,18 +25,15 @@ export function ContentWindowWithDelete({
 
   const [isSaving, setIsSaving] = useState(false);
   const timeoutRef = useRef(null);
-  const initialSaveIdRef = useRef<string | null>(null);
 
 
   useEffect(() => {
     if (editItem) {
-      setValue("title", editItem.title);
-      setValue("content", editItem.content);
-      initialSaveIdRef.current = editItem.id;
+      setValue("title", editItem?.title||'');
+      setValue("content", editItem?.content||'');
     } else {
       setValue("title", "");
       setValue("content", "");
-      initialSaveIdRef.current = null;
     }
   }, [editItem, setValue]);
 
@@ -64,7 +60,7 @@ export function ContentWindowWithDelete({
     }
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data:any) => {
     setIsSaving(true);
     await saveData(data);
     onClose();

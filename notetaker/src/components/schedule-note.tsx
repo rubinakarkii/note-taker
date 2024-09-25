@@ -10,6 +10,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { toast } from "react-toastify";
 import "react-datepicker/dist/react-datepicker.css";
 import {
+  formatDate,
   formatETA,
   formatToETA,
   isDateInFuture,
@@ -17,7 +18,7 @@ import {
 import { useEffect, useState } from "react";
 import { Input } from "./ui/input";
 
-export function ScheduleNote({ onClose, getNotes, scheduleItem }) {
+export function ScheduleNote({ onClose, getNotes, scheduleItem ,setScheduleItem}) {
   const {
     control,
     handleSubmit,
@@ -30,9 +31,13 @@ export function ScheduleNote({ onClose, getNotes, scheduleItem }) {
 
   useEffect(() => {
     if (scheduleItem.eta) {
-      setValue("eta", new Date(scheduleItem.eta));
+      setValue("eta", formatDate(scheduleItem.eta));
       setValue("email", scheduleItem.email);
 
+    }
+    else{
+      setValue("eta","");
+      setValue("email","");
     }
   }, [scheduleItem]);
 
@@ -40,7 +45,7 @@ export function ScheduleNote({ onClose, getNotes, scheduleItem }) {
     const formatDate = formatToETA(new Date(data.eta));
     const formatData = {
       ...data,
-      eta: formatDate,
+      eta:  formatDate,
       notes_id: scheduleItem.id,
     };
     let response;
@@ -59,6 +64,8 @@ export function ScheduleNote({ onClose, getNotes, scheduleItem }) {
       toast.success(response.data.message);
       onClose();
       getNotes();
+      setScheduleItem(null)
+      setEditReminder(false)
     } catch (error) {
       console.error("Error occurred during submission:", error);
       toast.error("Failed to save note. Please try again.");
@@ -86,6 +93,9 @@ export function ScheduleNote({ onClose, getNotes, scheduleItem }) {
     }
   };
 
+  console.log('hello',isDateInFuture(scheduleItem.eta) && !editReminder);
+  
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div
@@ -112,7 +122,7 @@ export function ScheduleNote({ onClose, getNotes, scheduleItem }) {
             </Button>
           </div>
 
-          {isDateInFuture(scheduleItem.eta) && !editReminder ? (
+          {(isDateInFuture(scheduleItem.eta) && !editReminder) ? (
             <>
               <p className="text-white font-semibold">
                 You already have a reminder scheduled for{" "}
@@ -152,6 +162,7 @@ export function ScheduleNote({ onClose, getNotes, scheduleItem }) {
                         dateFormat="Pp"
                         timeFormat="HH:mm"
                         minDate={new Date()}
+                        
                       />
                     );
                   }}
