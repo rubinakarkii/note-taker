@@ -152,14 +152,20 @@ button:focus-visible {
   font-family: Arial, sans-serif; /* Change the font */
   background-color: #fff; /* Background color */
   border: 1px solid #ccc; /* Border color */
-  border-radius: 5px; /* Rounded corners */
+  border-radius: 20px; /* Rounded corners */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
 }
 
 .react-datepicker-wrapper, .react-datepicker-wrapper input{
-  height: 30px;
+  height: 40px;
   width: 100%;
+  border-radius: 5px;
+  border:1px solid rgb(255 255 255 / 0.3);
 }
+.react-datepicker-wrapper input{
+  padding: 0.75rem;
+}
+
 
 .react-datepicker__header {
   

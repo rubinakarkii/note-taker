@@ -117,6 +117,8 @@ function home() {
             onClose={closePopup}
             getNotes={getNotes}
             editItem={editItem}
+            setEditItem={setEditItem}
+
           />
         )}
 

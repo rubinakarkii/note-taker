@@ -1,27 +1,39 @@
-export function formatToISO8601(date: Date) {
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(date.getUTCDate()).padStart(2, "0");
-  const hours = String(date.getUTCHours()).padStart(2, "0");
-  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-  const offset = "+00:00"; // Adjust this for your specific timezone
+export function formatToETA(date) {
+  // Get date components
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  const day = String(date.getDate()).padStart(2, '0');
+  
+  // Get time components
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  
+  // Get timezone offset in minutes
+  const timezoneOffset = -date.getTimezoneOffset();
+  const offsetHours = String(Math.floor(Math.abs(timezoneOffset) / 60)).padStart(2, '0');
+  const offsetMinutes = String(Math.abs(timezoneOffset) % 60).padStart(2, '0');
+  const sign = timezoneOffset >= 0 ? '+' : '-';
 
-  return `${year}-${month}-${day}T${hours}:${minutes}:00${offset}`;
+  // Build the final ETA string
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${offsetHours}:${offsetMinutes}`;
 }
 
 export function formatETA(eta: any) {
   const date = new Date(eta);
-  // Format to: "Wednesday, September 4, 2024, 03:45 PM"
+
   const options = {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
     hour12: true,
+    timeZoneName: 'short'
   };
-  return date.toLocaleString("en-US", options);
+
+  return date.toLocaleString('en-US', options);
 }
 
 export const isDateInFuture = (eta) => {
@@ -29,3 +41,8 @@ export const isDateInFuture = (eta) => {
     const etaDate = new Date(eta);
     return etaDate > currentDate; // Returns true if etaDate is in the future
   };
+
+
+
+
+  

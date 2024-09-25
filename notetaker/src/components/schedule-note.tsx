@@ -11,27 +11,36 @@ import { toast } from "react-toastify";
 import "react-datepicker/dist/react-datepicker.css";
 import {
   formatETA,
-  formatToISO8601,
+  formatToETA,
   isDateInFuture,
 } from "@/utils/dateFunction";
 import { useEffect, useState } from "react";
+import { Input } from "./ui/input";
 
 export function ScheduleNote({ onClose, getNotes, scheduleItem }) {
-  const { control, handleSubmit, setValue, getValues } = useFormContext();
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    register,
+    formState: { errors },
+  } = useFormContext();
 
   const [editReminder, setEditReminder] = useState(false);
 
   useEffect(() => {
     if (scheduleItem.eta) {
       setValue("eta", new Date(scheduleItem.eta));
+      setValue("email", scheduleItem.email);
+
     }
   }, [scheduleItem]);
 
   const onSubmit = async (data) => {
-    const formatDate = formatToISO8601(new Date(data.eta));
+    const formatDate = formatToETA(new Date(data.eta));
     const formatData = {
+      ...data,
       eta: formatDate,
-      email: "rkdummy97@gmail.com",
       notes_id: scheduleItem.id,
     };
     let response;
@@ -56,6 +65,13 @@ export function ScheduleNote({ onClose, getNotes, scheduleItem }) {
     }
   };
 
+  useEffect(() => {
+    if (errors) {
+    } else {
+      alert("hey");
+    }
+  }, [errors]);
+
   const handleDeleteReminder = async () => {
     try {
       const response = await axios.post(`${API_ENDPOINT}/delete_reminder`, {
@@ -73,7 +89,11 @@ export function ScheduleNote({ onClose, getNotes, scheduleItem }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div
-        className="relative w-[600px] h-[300px] bg-cover bg-center rounded-lg shadow-xl"
+        className={`relative w-[600px] bg-cover bg-center rounded-lg shadow-xl  ${
+          isDateInFuture(scheduleItem.eta) && !editReminder
+            ? "h-[250px]"
+            : "h-[400px]"
+        }`}
         style={{
           backgroundImage: "url('/src/assets/notes.webp?height=400&width=600')",
         }}
@@ -112,25 +132,63 @@ export function ScheduleNote({ onClose, getNotes, scheduleItem }) {
                 Set date and time for the reminder to be set
               </label>
 
-              <div className="mt-5 mb-5">
+              <div className="mt-5 mb-3">
+                <label htmlFor="eta" className="text-white">
+                  Date and time
+                </label>
                 <Controller
                   name="eta"
                   control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      className="bg-white/20 text-white placeholder-white/70 border-white/30 w-100 mb-5 min-h-6"
-                      selected={field.value}
-                      onChange={(date) => field.onChange(date)}
-                      showTimeSelect
-                      dateFormat="Pp"
-                      timeFormat="HH:mm"
-                      minDate={new Date()}
-                    />
-                  )}
+                  rules={{
+                    required: "Date and time is required",
+                  }}
+                  render={({ field }) => {
+                    return (
+                      <DatePicker
+                        className="bg-white/20 text-white placeholder-white/70 border-white/30 w-100 mb-5 min-h-6"
+                        selected={field.value || null}
+                        onChange={(date) => field.onChange(date)}
+                        showTimeSelect
+                        dateFormat="Pp"
+                        timeFormat="HH:mm"
+                        minDate={new Date()}
+                      />
+                    );
+                  }}
                 />
+                {errors.eta && (
+                  <p className="text-sm text-orange-500	 mt-2">
+                    {errors?.eta?.message}
+                  </p>
+                )}
               </div>
 
-              <Button className="w-full">Schedule</Button>
+              <div>
+                <label htmlFor="email" className="text-white">
+                  Email
+                </label>
+
+                <Input
+                  type="text"
+                  placeholder="Enter email"
+                  className="bg-white/20 text-white placeholder-white/70 border-white/30"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/,
+                      message: "Invalid email address",
+                    },
+                  })}
+                />
+
+                {errors.email && (
+                  <p className="text-sm text-orange-500	 mt-2">
+                    {errors?.email?.message}
+                  </p>
+                )}
+              </div>
+
+              <Button className="w-full mt-5">Schedule</Button>
             </form>
           )}
         </div>

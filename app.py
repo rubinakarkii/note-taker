@@ -83,7 +83,9 @@ def update_reminder():
             result.revoke(terminate=True)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    task = send_reminder.apply_async(args=[note.content, receiver_email], eta=reminder_eta
+    task = send_reminder.apply_async(args=[note.content, 
+                                    receiver_email], 
+                                    eta=reminder_eta
                                     )
     note.task_id = task.id
     note.eta = reminder_eta
@@ -105,7 +107,7 @@ def delete_reminder():
             result.revoke(terminate=True)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    note.task_id=None
+    note.task_id = None
     note.eta = None
     note.email = None
     db.session.commit()
